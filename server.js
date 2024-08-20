@@ -15,8 +15,12 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  socket.on('chat message', (msg) => {
+    console.log('message: ' + msg);
+    io.emit('chat message', msg);  // Broadcast the message to all clients
+  });
 });
+
 
 server.listen(3000, () => {
   console.log('server running at http://localhost:3000');

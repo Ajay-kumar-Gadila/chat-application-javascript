@@ -14,14 +14,30 @@ app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
 });
 
+
 io.on('connection', (socket) => {
+  socket.on('join', (userName) => {
+      socket.userName = userName;
+      io.emit('user joined', userName);
+  });
+
+  socket.on('leave', (userName) => {
+      io.emit('user left', userName);
+      socket.disconnect();
+  });
+
+  socket.on('disconnect', () => {
+      if (socket.userName) {
+          io.emit('user left', socket.userName);
+      }
+  });
+
   socket.on('chat message', (msg) => {
-    console.log('message: ' + msg);
-    io.emit('chat message', msg);  // Broadcast the message to all clients
+      io.emit('chat message', msg);
   });
 });
-
 
 server.listen(3000, () => {
   console.log('server running at http://localhost:3000');
 });
+
